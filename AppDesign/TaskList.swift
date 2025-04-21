@@ -8,7 +8,8 @@
 import SwiftUI
 import SwiftData
 
-struct Tasks: View {
+struct TaskList: View {
+    
     @State private var desc = ""
     @State private var newDate = Date.now
     @Query(sort: \Task.title) private var tasks: [Task]
@@ -18,10 +19,42 @@ struct Tasks: View {
             .font(.title)
             .fontWeight(.semibold)
             .foregroundStyle(.black)
-        VStack {
+        VStack(alignment: .leading) {
             NavigationSplitView {
-                List {
-                    
+                Group {
+                    if !tasks.isEmpty {
+                        List {
+                            ForEach(tasks) { task in
+                                HStack {
+                                    VStack(alignment: .leading) {
+                                        NavigationLink(task.title) {
+                                            TaskDetail(task:task)
+                                        }
+                                        .strikethrough(task.isDone)
+                                        .foregroundColor(task.isDone ? .secondary : .primary)
+                                        Text("\(task.dueDate)")
+                                            .foregroundColor(.secondary)
+                                    }
+                                    Button {
+                                                task.isDone.toggle()
+                                                withAnimation(.linear(duration: 1)) {
+                                                    context.delete(task)
+                                                    try? context.save()
+                                                }
+                                            } label: {
+                                                HStack {
+                                                    Image(systemName: task.isDone ? "checkmark.square" : "square")
+                                                        .foregroundColor(task.isDone ? .green : .gray)
+                                                }
+                                            }
+                                            .buttonStyle(.plain)
+                                    Spacer()
+                                }
+                            }
+                        }
+                    } else {
+                        ContentUnavailableView("Add Tasks", systemImage: "document.on.clipboard")
+                    }
                 }
                 Text("Add Task")
                     .font(.headline)
@@ -33,21 +66,23 @@ struct Tasks: View {
                     Button("Add", systemImage: "plus.app") {
                         let newTask = Task(title: desc, dueDate: newDate, isDone: false)
                         context.insert(newTask)
+                        print(context)
                         desc = ""
                     }
                     .padding(5)
-                    .foregroundColor(Color.blue)
-                    .background(Color.white)
+                    .foregroundColor(Color.white)
+                    .background(Color.blue)
                     .cornerRadius(5)
                 }
             } detail: {
-                Text("Select a Song")
-                    .navigationTitle("Song")
+                Text("Select a task")
+                    .navigationTitle("Task")
             }
         }
     }
 }
 
 #Preview {
-    Tasks()
+    TaskList()
+        .modelContainer(SampleData.shared.modelContainer)
 }

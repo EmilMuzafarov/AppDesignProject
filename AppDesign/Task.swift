@@ -20,4 +20,7 @@ class Task {
         self.dueDate = dueDate;
         self.isDone = isDone
     }
+    static let sampleData = [
+        Task(title: "Chore", dueDate: Date.now, isDone: false)
+        ]
 }

@@ -7,12 +7,20 @@
 
 import SwiftUI
 
-struct CustomShapes: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct Triangle: Shape {
+    var point: CGPoint
+    var length: CGFloat
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: point)
+        path.addLine(to: CGPoint(x: point.x + length, y: point.y))
+        path.addLine(to: CGPoint(x: point.x + (length / 2), y: point.y - length))
+        path.closeSubpath()
+        return path
     }
 }
 
+
 #Preview {
-    CustomShapes()
+    Triangle(point: CGPoint(x: 1.25, y: 12.5), length: 50)
 }
